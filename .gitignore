@@ -1,0 +1,9 @@
+﻿# Virtual Environment
+UrRight22-env/
+venv/
+__pycache__/
+*.pyc
+.env
+chroma_data/
+.vscode/
+.DS_Store

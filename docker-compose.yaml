@@ -1,0 +1,74 @@
+services:
+  # UrRight API service
+  urright_api:
+    build: .
+    container_name: urright_api
+    ports:
+      - "8516:8516"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - POSTGRES_USER=urright_user
+      - POSTGRES_PASSWORD=urright_password
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=urright_db
+    volumes:
+      - ./Data:/app/Data
+      - ./chroma_data:/app/chroma_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    networks:
+      - urright_network
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8516 --reload
+
+  # ChromaDB service
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: urright_chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - urright_network
+    restart: unless-stopped
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: urright_postgres
+    environment:
+      POSTGRES_USER: urright_user
+      POSTGRES_PASSWORD: urright_password
+      POSTGRES_DB: urright_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - urright_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U urright_user -d urright_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  chroma_data:
+  postgres_data:
+
+networks:
+  urright_network:
+    driver: bridge

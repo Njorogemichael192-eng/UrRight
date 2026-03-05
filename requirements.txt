@@ -1,0 +1,21 @@
+# Core dependencies
+python-dotenv==1.0.0
+groq==0.4.2      
+
+# API
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.23
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Vector Store - Pin numpy to version compatible with chromadb
+numpy==1.24.3
+chromadb==0.4.22
+
+# PDF Processing
+PyPDF2==3.0.1

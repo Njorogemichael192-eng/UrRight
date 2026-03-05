@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrRight - Kenyan Constitution Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --kenya-green: #006233;
+            --kenya-red: #BB0001;
+            --kenya-white: #FFFFFF;
+            --kenya-black: #000000;
+            --kenya-gold: #D4A017;
+            --kenya-cream: #F5F2E9;
+            --kenya-gray: #4A4A4A;
+            --kenya-light-gray: #F0F0F0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--kenya-green) 0%, var(--kenya-white) 50%, var(--kenya-red) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1600px;
+            height: 95vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            overflow: hidden;
+            border: 3px solid var(--kenya-gold);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: linear-gradient(180deg, var(--kenya-green) 0%, var(--kenya-red) 100%);
+            color: var(--kenya-white);
+            padding: 40px 25px;
+            display: flex;
+            flex-direction: column;
+            border-right: 3px solid var(--kenya-gold);
+            transition: left 0.3s ease;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .coat-of-arms {
+            font-size: 80px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .logo-section h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo-section .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            font-style: italic;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .features {
+            flex: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-right: 20px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .feature-text {
+            font-size: 16px;
+        }
+
+        .feature-text strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .language-selector {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .language-selector h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            margin: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: var(--kenya-gold);
+            border-color: var(--kenya-gold);
+            color: var(--kenya-black);
+            font-weight: bold;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .coming-soon {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--kenya-gold);
+            font-style: italic;
+            padding: 8px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .stats {
+            margin-top: 40px;
+            font-size: 15px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Main Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--kenya-cream);
+            position: relative;
+        }
+
+        /* "Know UrRight" background watermark in chat area */
+        .chat-area::before {
+            content: "Know UrRight";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 8vw;
+            font-weight: 900;
+            color: linear-gradient(135deg, var(--kenya-green), var(--kenya-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+            text-transform: uppercase;
+            letter-spacing: 20px;
+            opacity: 0.1;
+            width: 100%;
+            text-align: center;
+        }
+
+        .chat-header {
+            padding: 25px 35px;
+            background: var(--kenya-white);
+            border-bottom: 3px solid var(--kenya-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-header h2 {
+            color: var(--kenya-green);
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .chat-header h2 i {
+            color: var(--kenya-red);
+            margin-right: 15px;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: var(--kenya-gray);
+        }
+
+        .icon-btn:hover {
+            background: var(--kenya-light-gray);
+            color: var(--kenya-green);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 35px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SAFETY BANNERS ===== */
+        .safety-banner {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideDown 0.3s ease;
+        }
+
+        .child-helpline {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 20px;
+            border-left: 5px solid #c0392b;
+        }
+
+        .urgency-banner {
+            background: #e74c3c;
+            color: white;
+            padding: 15px 20px;
+            border-left: 5px solid #c0392b;
+            animation: pulse 2s infinite;
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .banner-icon {
+            font-size: 28px;
+        }
+
+        .banner-text {
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .banner-text strong {
+            font-size: 16px;
+        }
+
+        .banner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .banner-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .emergency-contact {
+            display: inline-block;
+            background: white;
+            color: #e74c3c;
+            padding: 5px 12px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 5px 10px 5px 0;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .emergency-contact:hover {
+            background: #f8f8f8;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 30px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        /* ===== FOLLOW-UP QUESTION STYLES ===== */
+        .message.bot.followup {
+            border-left: 4px solid var(--kenya-gold);
+            background: #fff9e6;
+        }
+
+        .followup-container {
+            margin: 10px 0;
+        }
+
+        .followup-question {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--kenya-green);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--kenya-gold);
+            color: var(--kenya-black);
+            font-weight: bold;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .followup-intro {
+            font-style: italic;
+            margin-bottom: 10px;
+            color: var(--kenya-gray);
+        }
+
+        .waiting-indicator {
+            display: inline-block;
+            font-size: 12px;
+            color: var(--kenya-gold);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .waiting-indicator::after {
+            content: "...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        /* ===== COLLECTED DETAILS STYLES ===== */
+        .collected-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(212, 160, 23, 0.1);
+            border-radius: 12px;
+        }
+
+        .detail-tag {
+            display: inline-block;
+            background: var(--kenya-green);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .message-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 15px;
+        }
+
+        .user .message-avatar {
+            background: var(--kenya-green);
+            color: white;
+            order: 2;
+        }
+
+        .bot .message-avatar {
+            background: var(--kenya-red);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 65%;
+            padding: 20px 25px;
+            border-radius: 25px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .user .message-content {
+            background: var(--kenya-green);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot .message-content {
+            background: white;
+            color: var(--kenya-black);
+            border-bottom-left-radius: 5px;
+            border-left: 4px solid var(--kenya-gold);
+        }
+
+        /* Better message separation */
+        .message + .message {
+            margin-top: 25px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 20px;
+        }
+
+        .message-time {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .sources {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .bot .sources {
+            border-top-color: #ddd;
+        }
+
+        .source-tag {
+            display: inline-block;
+            background: var(--kenya-gold);
+            color: var(--kenya-black);
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-right: 0;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Feedback & Copy Buttons */
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: flex-end;
+        }
+
+        .action-btn-small {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--kenya-gray);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn-small:hover {
+            background: var(--kenya-gold);
+            border-color: var(--kenya-gold);
+            color: var(--kenya-black);
+        }
+
+        .action-btn-small.success {
+            background: var(--kenya-green);
+            border-color: var(--kenya-green);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 20px 25px;
+            background: white;
+            border-radius: 25px;
+            border-bottom-left-radius: 5px;
+            width: fit-content;
+            border-left: 4px solid var(--kenya-gold);
+        }
+
+        .typing-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--kenya-gray);
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 25px 35px;
+            background: white;
+            border-top: 3px solid var(--kenya-gold);
+            position: relative;
+            z-index: 1;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--kenya-light-gray);
+            border-radius: 60px;
+            padding: 8px 8px 8px 25px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--kenya-gold);
+            background: white;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 18px 0;
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .input-wrapper input::placeholder {
+            font-size: 18px;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn.mic {
+            background: var(--kenya-green);
+            color: white;
+        }
+
+        .action-btn.mic.listening {
+            background: var(--kenya-red);
+            animation: pulse 1.5s infinite;
+        }
+
+        .action-btn.speaker {
+            background: var(--kenya-gold);
+            color: var(--kenya-black);
+        }
+
+        .action-btn.stop {
+            background: var(--kenya-gray);
+            color: white;
+        }
+
+        .action-btn.stop:hover {
+            background: var(--kenya-red);
+        }
+
+        .action-btn.send {
+            background: var(--kenya-red);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .language-indicator {
+            text-align: center;
+            font-size: 16px;
+            color: var(--kenya-gray);
+            margin-top: 15px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: var(--kenya-light-gray);
+            border: 1px solid #ddd;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--kenya-gray);
+        }
+
+        .quick-btn:hover {
+            background: var(--kenya-gold);
+            border-color: var(--kenya-gold);
+            color: var(--kenya-black);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--kenya-gold);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--kenya-green);
+        }
+
+        .server-status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .server-status.online {
+            background: var(--kenya-green);
+            color: white;
+            display: block;
+        }
+        
+        .server-status.offline {
+            background: var(--kenya-red);
+            color: white;
+            display: block;
+        }
+        
+        .server-status.warning {
+            background: var(--kenya-gold);
+            color: var(--kenya-black);
+            display: block;
+        }
+
+        .message-content .disclaimer {
+            font-size: 12px;
+            font-style: italic;
+            font-weight: normal;
+            color: #666;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .message-content .disclaimer-separator {
+            border: none;
+            border-top: 1px dashed #999;
+            margin: 15px 0 10px 0;
+        }
+
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            background: var(--kenya-gold);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            color: var(--kenya-black);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .sidebar {
+                position: fixed;
+                width: 280px;
+                height: 100vh;
+                left: -280px;
+                top: 0;
+                z-index: 1000;
+                border-radius: 0 20px 20px 0;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .chat-area {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .main-container {
+                padding: 0;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .chat-header h2 {
+                font-size: 20px;
+                margin-left: 40px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                font-size: 16px;
+            }
+
+            .banner-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="coat-of-arms">⚖️🇰🇪</div>
+                <h1>UrRight</h1>
+                <div class="subtitle">Know Your Constitutional Rights</div>
+            </div>
+
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">🗣️</div>
+                    <div class="feature-text">
+                        <strong>Voice Enabled</strong>
+                        Ask in English or Swahili
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📚</div>
+                    <div class="feature-text">
+                        <strong>Constitution 2010</strong>
+                        Complete Kenyan Constitution
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚖️</div>
+                    <div class="feature-text">
+                        <strong>Know Your Rights</strong>
+                        Article 19-59 Bill of Rights
+                    </div>
+                </div>
+            </div>
+
+            <div class="language-selector">
+                <h3>🌍 Select Language</h3>
+                <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn" onclick="setLanguage('sw')">Kiswahili</button>
+            </div>
+            
+            <div class="coming-soon">
+                🗣️ More languages (Kikuyu, Luo, Kamba) coming soon!
+            </div>
+
+            <div class="stats">
+                <div id="sessionInfo">Session active</div>
+                <div style="margin-top: 15px;">🇰🇪 For every Kenyan</div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <h2>
+                    <i>⚖️</i>
+                    <span id="headerTitle">Your Rights, Simplified</span>
+                </h2>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleSpeech()" id="speechToggleBtn" title="Toggle speech output">🔊</button>
+                    <button class="icon-btn" onclick="clearChat()" title="New conversation">🗑️</button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages">
+                <!-- Safety banners will be inserted here dynamically -->
+                
+                <!-- Welcome message -->
+                <div class="message bot">
+                    <div class="message-avatar">⚖️</div>
+                    <div class="message-content">
+                        <strong>🇰🇪 Karibu Kenya! Welcome!</strong><br><br>
+                        I'm UrRight, your constitutional assistant. I can help you understand:
+                        <br><br>
+                        • Your rights when arrested (Article 49)<br>
+                        • Police detention limits (24 hours)<br>
+                        • Voting procedures (Article 38)<br>
+                        • Land rights (Articles 60-68)<br>
+                        • And more!<br><br>
+                        <em>Ask me in English or Swahili - I'll respond in the same language!</em>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type your question here... (e.g., 'What are my rights if arrested?')"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <div class="input-actions">
+                        <button class="action-btn mic" id="micBtn" onclick="toggleListening()" title="Voice input">🎤</button>
+                        <button class="action-btn speaker" id="speakerBtn" onclick="speakLastResponse()" title="Listen to response">🔊</button>
+                        <button class="action-btn stop" id="stopBtn" onclick="stopSpeech()" title="Stop speaking">⏹️</button>
+                        <button class="action-btn send" onclick="sendMessage()" title="Send message">➤</button>
+                    </div>
+                </div>
+                
+                <div class="language-indicator" id="languageIndicator">
+                    🗣️ Current language: English
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="quickQuestion('What are my rights if arrested?')">🚔 Rights if arrested</button>
+                    <button class="quick-btn" onclick="quickQuestion('How long can police hold me?')">⏱️ Police detention</button>
+                    <button class="quick-btn" onclick="quickQuestion('How do I vote?')">🗳️ Voting process</button>
+                    <button class="quick-btn" onclick="quickQuestion('Na haki zangu nikamatwa na polisi?')">🇰🇪 Swahili</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server status banner -->
+    <div id="serverStatus" class="server-status"></div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8516';
+        let sessionId = 'session_' + Date.now();
+        let currentLanguage = 'en';
+        let isListening = false;
+        let speechEnabled = true;
+        let lastResponse = '';
+        let recognition = null;
+        let synth = window.speechSynthesis;
+        let serverCheckInterval = null;
+        let voices = [];
+
+        // Load voices when available
+        if (synth) {
+            synth.addEventListener('voiceschanged', () => {
+                voices = synth.getVoices();
+                console.log('Voices loaded:', voices.map(v => `${v.name} (${v.lang})`));
+            });
+        }
+
+        // ===== FIX FOR FILE:// PROTOCOL =====
+        if (window.location.protocol === 'file:') {
+            const warningDiv = document.createElement('div');
+            warningDiv.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: var(--kenya-red);
+                color: white;
+                text-align: center;
+                padding: 15px;
+                font-size: 18px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                border-bottom: 3px solid var(--kenya-gold);
+            `;
+            warningDiv.innerHTML = `
+                ⚠️ FILE PROTOCOL DETECTED ⚠️<br>
+                Please serve this file through a web server.<br>
+                <small>Run: python -m http.server 8000 then open http://localhost:8000/index.html</small>
+            `;
+            document.body.prepend(warningDiv);
+            console.error('❌ Running from file:// protocol - API calls will be blocked!');
+            console.log('✅ Solution: Run "python -m http.server 8000" and open http://localhost:8000/index.html');
+        }
+
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('messageInput').value = transcript;
+                stopListening();
+                sendMessage();
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopListening();
+                updateServerStatus('warning', 'Voice input failed. Please try again.');
+            };
+            
+            recognition.onend = () => {
+                stopListening();
+            };
+        }
+
+        // Update server status
+        function updateServerStatus(status, message) {
+            const statusEl = document.getElementById('serverStatus');
+            statusEl.className = 'server-status ' + status;
+            statusEl.textContent = message;
+            
+            if (status === 'online') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // ===== SAFETY BANNER FUNCTIONS =====
+        function showChildHelpline() {
+            const messagesDiv = document.getElementById('messages');
+            const existingBanner = document.getElementById('childHelplineBanner');
+            if (existingBanner) return;
+
+            const bannerDiv = document.createElement('div');
+            bannerDiv.id = 'childHelplineBanner';
+            bannerDiv.className = 'safety-banner child-helpline';
+            bannerDiv.innerHTML = `
+                <div class="banner-content">
+                    <span class="banner-icon">🛡️</span>
+                    <div class="banner-text">
+                        <strong>Need help now?</strong><br>
+                        Call Childline Kenya <strong>116</strong> (toll-free, 24/7)<br>
+                        <span style="font-size:13px;">You can also visit your nearest Children's Office or tell a trusted adult.</span>
+                    </div>
+                    <button class="banner-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </div>
+            `;
+            messagesDiv.insertBefore(bannerDiv, messagesDiv.firstChild);
+        }
+
+        function showUrgencyBanner() {
+            const messagesDiv = document.getElementById('messages');
+            const existingBanner = document.getElementById('urgencyBanner');
+            if (existingBanner) return;
+
+            const bannerDiv = document.createElement('div');
+            bannerDiv.id = 'urgencyBanner';
+            bannerDiv.className = 'safety-banner urgency-banner';
+            bannerDiv.innerHTML = `
+                <div class="banner-content">
+                    <span class="banner-icon">⚠️</span>
+                    <div class="banner-text">
+                        <strong>This seems urgent. If you're in danger:</strong><br>
+                        <span class="emergency-contact">Police: 999 or 112</span>
+                        <span class="emergency-contact">Childline: 116</span>
+                        <span class="emergency-contact">Gender Violence: 1195</span>
+                    </div>
+                    <button class="banner-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </div>
+            `;
+            messagesDiv.insertBefore(bannerDiv, messagesDiv.firstChild);
+        }
+
+        function checkForUrgency(text) {
+            const urgentKeywords = ['abuse', 'beat', 'hurt', 'danger', 'emergency', 'violence', 'assault', 'raped', 'attack', 'threat'];
+            const lowerText = text.toLowerCase();
+            return urgentKeywords.some(keyword => lowerText.includes(keyword));
+        }
+
+        function checkForChild(text) {
+            const childKeywords = ['teacher', 'school', 'class', 'my parent', 'my mom', 'my dad', 'years old', 'age'];
+            const lowerText = text.toLowerCase();
+            return childKeywords.some(keyword => lowerText.includes(keyword));
+        }
+
+        // Set language
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const languages = {
+                'en': 'English',
+                'sw': 'Kiswahili'
+            };
+            document.getElementById('languageIndicator').innerHTML = `🗣️ Current language: ${languages[lang]}`;
+            
+            if (recognition) {
+                if (lang === 'en') recognition.lang = 'en-US';
+                else if (lang === 'sw') recognition.lang = 'sw-TZ';
+            }
+            
+            const headers = {
+                'en': 'Your Rights, Simplified',
+                'sw': 'Haki Zako, Kwa Urahisi'
+            };
+            document.getElementById('headerTitle').textContent = headers[lang];
+        }
+
+        // Toggle speech recognition
+        function toggleListening() {
+            if (!recognition) {
+                updateServerStatus('warning', 'Voice input is not supported in your browser. Please use Chrome or Edge.');
+                return;
+            }
+            
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            isListening = true;
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.add('listening');
+            micBtn.innerHTML = '⏹️';
+            document.getElementById('messageInput').placeholder = 'Listening... Speak now...';
+            
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error('Failed to start recognition:', e);
+                stopListening();
+                updateServerStatus('warning', 'Failed to start voice recognition');
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.remove('listening');
+            micBtn.innerHTML = '🎤';
+            document.getElementById('messageInput').placeholder = 'Type your question here...';
+            
+            try {
+                recognition.stop();
+            } catch (e) {}
+        }
+
+        // Toggle speech output - ONLY mutes/unmutes
+        function toggleSpeech() {
+            speechEnabled = !speechEnabled;
+            const btn = document.getElementById('speechToggleBtn');
+            
+            if (speechEnabled) {
+                btn.innerHTML = '🔊';
+                btn.title = 'Mute';
+                updateServerStatus('online', 'Voice unmuted');
+            } else {
+                btn.innerHTML = '🔇';
+                btn.title = 'Unmute';
+                if (synth) synth.cancel();
+                updateServerStatus('online', 'Voice muted');
+            }
+        }
+
+        // Stop speech immediately
+        function stopSpeech() {
+            if (synth) {
+                synth.cancel();
+                updateServerStatus('online', 'Speech stopped');
+            }
+        }
+
+        // Speak text - prefers female voices
+        function speakText(text, language = 'en') {
+            if (!speechEnabled) {
+                updateServerStatus('warning', 'Voice is muted. Click 🔊 to unmute');
+                return;
+            }
+            
+            if (!synth) return;
+            
+            synth.cancel();
+            
+            let cleanText = text
+                .replace(/#{1,6}\s?/g, '')
+                .replace(/\*\*/g, '')
+                .replace(/\*/g, '')
+                .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+                .replace(/---+/g, ' ')
+                .replace(/[📚💡🏠⚖️😊🇰🇪🔊🎤➤❓✅❌⚠️]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            if (!cleanText || cleanText.length < 10) {
+                cleanText = text
+                    .replace(/#{1,6}\s?/g, '')
+                    .replace(/\*\*/g, '')
+                    .replace(/\*/g, '')
+                    .replace(/---+/g, '')
+                    .replace(/[📚💡🏠⚖️😊🇰🇪]/g, '')
+                    .substring(0, 500);
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            
+            if (voices.length === 0) {
+                voices = synth.getVoices();
+            }
+            
+            if (language === 'sw') {
+                utterance.lang = 'sw-TZ';
+                
+                if (voices.length > 0) {
+                    let swahiliVoice = voices.find(v => 
+                        (v.lang.includes('sw') || v.name.includes('Swahili') || v.name.includes('Kiswahili')) && 
+                        (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Microsoft'))
+                    );
+                    
+                    if (!swahiliVoice) {
+                        swahiliVoice = voices.find(v => 
+                            (v.lang.includes('en') && v.name.includes('Africa')) && 
+                            (v.name.includes('Female') || v.name.includes('Google'))
+                        );
+                    }
+                    
+                    if (!swahiliVoice) {
+                        swahiliVoice = voices.find(v => 
+                            v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Samantha')
+                        );
+                    }
+                    
+                    if (!swahiliVoice) swahiliVoice = voices[0];
+                    
+                    utterance.voice = swahiliVoice;
+                    console.log('Using Swahili voice:', swahiliVoice.name);
+                }
+                
+                utterance.rate = 0.85;
+            } else {
+                utterance.lang = 'en-KE';
+                
+                if (voices.length > 0) {
+                    let englishVoice = voices.find(v => 
+                        (v.name.includes('Kenya') || v.name.includes('Africa')) && 
+                        (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Microsoft'))
+                    );
+                    
+                    if (!englishVoice) {
+                        englishVoice = voices.find(v => 
+                            v.lang.includes('en') && 
+                            (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('Victoria'))
+                        );
+                    }
+                    
+                    if (!englishVoice) {
+                        englishVoice = voices.find(v => 
+                            v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google')
+                        );
+                    }
+                    
+                    if (!englishVoice) englishVoice = voices[0];
+                    
+                    utterance.voice = englishVoice;
+                    console.log('Using English voice:', englishVoice.name);
+                }
+                
+                utterance.rate = 0.9;
+            }
+            
+            synth.speak(utterance);
+        }
+
+        // Speak last response
+        function speakLastResponse() {
+            if (lastResponse) {
+                speakText(lastResponse, currentLanguage);
+            } else {
+                updateServerStatus('warning', 'No response to read yet');
+            }
+        }
+
+        // Quick question
+        function quickQuestion(question) {
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+
+        // Handle enter key
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Clear chat
+        function clearChat() {
+            document.getElementById('messages').innerHTML = `
+                <div class="message bot">
+                    <div class="message-avatar">⚖️</div>
+                    <div class="message-content">
+                        <strong>🇰🇪 New conversation started.</strong><br>
+                        How can I help you understand your constitutional rights today?
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            `;
+            sessionId = 'session_' + Date.now();
+            lastResponse = '';
+            updateServerStatus('online', 'Chat cleared');
+        }
+
+        function showNotification(message) {
+            updateServerStatus('warning', message);
+        }
+
+        // ===== UPDATED SEND MESSAGE FUNCTION - WORKS WITH NEW INTELLIGENT BACKEND =====
+        async function sendMessage() {
+            if (window.location.protocol === 'file:') {
+                updateServerStatus('offline', '❌ Cannot connect: Running from file:// protocol. Use http://localhost:8000/index.html instead');
+                return;
+            }
+
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Check for urgency and child indicators
+            if (checkForUrgency(message)) {
+                showUrgencyBanner();
+            }
+            if (checkForChild(message)) {
+                showChildHelpline();
+            }
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const typingId = showTypingIndicator();
+            
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId,
+                        language: currentLanguage
+                    })
+                });
+                
+                removeTypingIndicator(typingId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    lastResponse = data.response;
+                    
+                    // Add bot response
+                    addMessage(data.response, 'bot', data.sources, data.is_followup || false, data.awaiting_details || false);
+                    
+                    // If we have collected details, show them
+                    if (data.collected_details && data.collected_details.length > 0) {
+                        showCollectedDetails(data.collected_details);
+                    }
+                    
+                    updateServerStatus('online', '✅ Response received');
+                    
+                } else {
+                    const error = await response.json();
+                    addMessage(`Error: ${error.detail || 'Something went wrong'}`, 'bot');
+                    updateServerStatus('offline', `Server error: ${response.status}`);
+                }
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('Network error. Please check if the server is running.', 'bot');
+                console.error('Error:', error);
+                updateServerStatus('offline', '❌ Cannot connect to server. Make sure python main.py is running');
+            }
+        }
+
+        // ===== UPDATED addMessage FUNCTION =====
+        function addMessage(text, sender, sources = [], isFollowUp = false, awaitingDetails = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            
+            let messageClass = `message ${sender}`;
+            if (isFollowUp) {
+                messageClass += ' followup';
+            }
+            messageDiv.className = messageClass;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Format text with follow-up styling if needed
+            let formattedText = text;
+            
+            if (isFollowUp && text.includes('?')) {
+                const lines = text.split('\n').filter(line => line.trim());
+                let intro = '';
+                let questions = [];
+                
+                lines.forEach(line => {
+                    if (line.includes('?')) {
+                        questions.push(line);
+                    } else if (!line.includes('---') && !line.includes('*')) {
+                        intro += line + '\n';
+                    }
+                });
+                
+                let followupHtml = '';
+                if (intro) {
+                    followupHtml += `<div class="followup-intro">${intro.replace(/\n/g, '<br>')}</div>`;
+                }
+                
+                followupHtml += '<div class="followup-container">';
+                questions.forEach((q, index) => {
+                    const questionText = q.replace(/^\d+\.\s*/, '');
+                    followupHtml += `
+                        <div class="followup-question">
+                            <span class="question-number">${index + 1}</span>
+                            ${questionText}
+                        </div>
+                    `;
+                });
+                followupHtml += '</div>';
+                
+                if (awaitingDetails) {
+                    followupHtml += '<div class="waiting-indicator">Waiting for your response</div>';
+                }
+                
+                formattedText = followupHtml;
+            } else {
+                formattedText = text.replace(/\n/g, '<br>');
+            }
+            
+            // Check for disclaimer
+            if (text.includes('---')) {
+                const parts = text.split('---');
+                const mainContent = parts[0];
+                const disclaimerText = parts[1] ? parts[1].replace(/\*/g, '') : '';
+                
+                formattedText = `
+                    <div>${mainContent.replace(/\n/g, '<br>')}</div>
+                    <hr class="disclaimer-separator">
+                    <div class="disclaimer">${disclaimerText}</div>
+                `;
+            }
+            
+            let sourcesHtml = '';
+            if (sources && sources.length > 0) {
+                sourcesHtml = '<div class="sources">' + 
+                    sources.map(s => `<span class="source-tag">${s}</span>`).join('') + 
+                    '</div>';
+            }
+            
+            // Add action buttons for bot messages
+            let actionsHtml = '';
+            if (sender === 'bot' && !isFollowUp) {
+                actionsHtml = `
+                    <div class="message-actions">
+                        <button class="action-btn-small" onclick="feedback('helpful', this)">
+                            👍 Helpful
+                        </button>
+                        <button class="action-btn-small" onclick="feedback('not-helpful', this)">
+                            👎 Not helpful
+                        </button>
+                        <button class="action-btn-small" onclick="copyResponse(this, \`${text.replace(/`/g, '\\`')}\`)">
+                            📋 Copy
+                        </button>
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${sender === 'user' ? '👤' : '⚖️'}</div>
+                <div class="message-content">
+                    ${formattedText}
+                    ${sourcesHtml}
+                    ${actionsHtml}
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ===== SHOW COLLECTED DETAILS =====
+        function showCollectedDetails(details) {
+            const messagesDiv = document.getElementById('messages');
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'collected-details';
+            
+            details.forEach(detail => {
+                const tag = document.createElement('span');
+                tag.className = 'detail-tag';
+                let displayText = detail;
+                if (detail.length > 40) {
+                    displayText = detail.substring(0, 40) + '...';
+                }
+                tag.textContent = '📝 ' + displayText;
+                detailsDiv.appendChild(tag);
+            });
+            
+            messagesDiv.appendChild(detailsDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const messagesDiv = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = id;
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">⚖️</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const element = document.getElementById(id);
+            if (element) element.remove();
+        }
+
+        // ===== UI FUNCTIONS =====
+        
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        function feedback(type, btn) {
+            const originalText = btn.innerHTML;
+            btn.classList.add('success');
+            
+            if (type === 'helpful') {
+                btn.innerHTML = '✓ Thanks!';
+            } else {
+                btn.innerHTML = '✓ Noted';
+            }
+            
+            setTimeout(() => {
+                btn.classList.remove('success');
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function copyResponse(btn, responseText) {
+            const cleanText = responseText.replace(/[📚💡🏠⚖️😊🇰🇪]/g, '');
+            
+            navigator.clipboard.writeText(cleanText).then(() => {
+                const originalText = btn.innerHTML;
+                btn.classList.add('success');
+                btn.innerHTML = '✓ Copied!';
+                
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Could not copy to clipboard');
+            });
+        }
+
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'healthy') {
+                        updateServerStatus('online', '✅ Connected to UrRight API');
+                    } else {
+                        updateServerStatus('warning', '⚠️ Server is starting up...');
+                    }
+                } else {
+                    updateServerStatus('offline', '❌ Server is not responding');
+                }
+            } catch (error) {
+                updateServerStatus('offline', '❌ Cannot connect to server');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkServerHealth();
+            serverCheckInterval = setInterval(checkServerHealth, 10000);
+            
+            if (window.location.protocol === 'file:') {
+                updateServerStatus('offline', '❌ Running from file:// protocol. Use http://localhost:8000/index.html');
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (serverCheckInterval) {
+                clearInterval(serverCheckInterval);
+            }
+        });
+    </script>
+</body>
+</html>

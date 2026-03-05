@@ -1,0 +1,42 @@
+# Virtual Environment
+UrRight22-env/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.local
+
+# Data (we mount this as volume, don't copy)
+Data/
+chroma_data/
+postgres_data/
+
+# Logs
+*.log
+
+# Docker
+Dockerfile
+docker-compose.yaml
+.dockerignore
+
+# Temp files
+*.tmp
+*.bak
+*.swp
