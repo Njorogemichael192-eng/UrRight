@@ -500,6 +500,10 @@ class ConversationMemory:
         """Clear waiting state after providing response"""
         self.awaiting_details[session_id] = False
         self.conversation_stage[session_id] = "responding"
+
+    def get_all_sessions(self) -> List[str]:
+        """Get all active session IDs"""
+        return list(self.memories.keys())    
     
     def clear_session(self, session_id: str):
         """Clear all memory for a session"""
@@ -842,24 +846,68 @@ Remember the disclaimer at the end separated by "---".
             logger.error(f"Response generation error: {e}")
             return f"I encountered an error. Please try again. {self._get_disclaimer(language)}"
     
-    # ===== GREETING DETECTION =====
+    # ===== INTELLIGENT GREETING DETECTION =====
     def _check_greeting(self, query: str) -> Optional[str]:
-        """Simple greeting detection"""
+        """
+        Intelligent greeting detection - uses AI to distinguish between greetings and questions
+        """
         q = query.lower().strip()
         
-        greetings_en = ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening']
-        greetings_sw = ['habari', 'jambo', 'mambo', 'vipi', 'hujambo', 'shikamoo']
-        thanks = ['thank', 'thanks', 'asante']
-        bye = ['bye', 'goodbye', 'kwaheri', 'exit', 'quit']
+        # Common greeting patterns (exact matches or very short)
+        simple_greetings = {
+            'hello', 'hi', 'hey', 'howdy', 'greetings',
+            'habari', 'jambo', 'mambo', 'vipi', 'hujambo', 'shikamoo', 'sasa',
+            'good morning', 'good afternoon', 'good evening',
+            'morning', 'afternoon', 'evening'
+        }
         
-        if any(g in q for g in greetings_en):
-            return "🇰🇪 👋 Hello! I'm UrRight, your Kenyan constitutional assistant. How can I help you understand your rights today?"
-        elif any(g in q for g in greetings_sw):
-            return "🇰🇪 👋 Habari! Mimi ni UrRight, msaidizi wako wa katiba ya Kenya. Ninaweza kukusaidia vipi leo?"
-        elif any(t in q for t in thanks):
+        # Check for exact matches or very short queries (likely greetings)
+        if q in simple_greetings or (len(q.split()) <= 2 and any(g in q for g in simple_greetings)):
+            # Check if it's actually a greeting or just a word
+            if q.startswith(('hello', 'hi', 'hey', 'habari', 'jambo')):
+                return "🇰🇪 👋 Hello! I'm UrRight, your Kenyan constitutional assistant. How can I help you understand your rights today?"
+        
+        # For longer queries, let the AI decide
+        if len(q.split()) > 3:
+            prompt = f"""
+Determine if the following user message is JUST a greeting/small talk or a REAL question about Kenyan law.
+
+User message: "{query}"
+
+If it's JUST a greeting/small talk (like hello, hi, how are you, etc.), respond with "GREETING".
+If it's asking a REAL question about law, rights, constitution, or any Kenyan matter, respond with "QUESTION".
+
+Respond with ONLY one word: GREETING or QUESTION
+"""
+            try:
+                response = groq_client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1,
+                    max_tokens=10
+                )
+                result = response.choices[0].message.content.strip().upper()
+                
+                if "GREETING" in result:
+                    # Check language for appropriate greeting response
+                    if any(word in q for word in ['habari', 'jambo', 'mambo', 'vipi', 'hujambo', 'shikamoo']):
+                        return "🇰🇪 👋 Habari! Mimi ni UrRight, msaidizi wako wa katiba ya Kenya. Ninaweza kukusaidia vipi leo?"
+                    else:
+                        return "🇰🇪 👋 Hello! I'm UrRight, your Kenyan constitutional assistant. How can I help you understand your rights today?"
+            except:
+                # If AI fails, fall back to simple detection
+                pass
+        
+        # Check for thanks/goodbye (simpler patterns)
+        thanks_words = ['thank', 'thanks', 'asante', 'thankyou']
+        bye_words = ['bye', 'goodbye', 'kwaheri', 'see you', 'exit', 'quit']
+        
+        if any(t in q for t in thanks_words) and len(q.split()) < 5:
             return "You're most welcome! 😊 Is there anything else about your rights I can help with?"
-        elif any(b in q for b in bye):
+        
+        if any(b in q for b in bye_words) and len(q.split()) < 5:
             return "Goodbye! Stay informed and know your rights. Come back anytime! 🇰🇪"
+        
         return None
     
     def _get_disclaimer(self, language: str) -> str:

@@ -1005,7 +1005,8 @@
 
     <script>
         // Configuration
-        const API_URL = 'http://localhost:8516';
+        //const API_URL = 'http://localhost:8516';
+        const API_URL = window.location.origin.replace('8000', '8516');
         let sessionId = 'session_' + Date.now();
         let currentLanguage = 'en';
         let isListening = false;
