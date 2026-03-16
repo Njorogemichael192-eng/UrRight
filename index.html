@@ -756,6 +756,7 @@
             display: flex;
             flex-direction: column;
             gap: var(--s-1);
+            width: 100%;
         }
 
         .message-content {
@@ -1149,7 +1150,8 @@
                 </button>
 
                 <div style="display: flex; gap: var(--s-2);">
-                    <button class="icon-btn" onclick="toggleSpeech()" id="speechToggleBtn" title="Toggle audio feedback">
+                    <!-- Voice Output Button - Fixed to play last response -->
+                    <button class="icon-btn" id="speechOutputBtn" onclick="speakLastResponse()" title="Play last response">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                     </button>
                     <button class="icon-btn" onclick="clearChat()" title="Reset session">
@@ -1158,7 +1160,7 @@
                 </div>
             </header>
 
-            <!-- Audio Player (NEW) -->
+            <!-- Audio Player -->
             <div id="audioPlayer" class="audio-player" style="display: none;">
                 <div class="audio-progress" onclick="seekAudio(event)">
                     <div class="progress-bar" id="audioProgress"></div>
@@ -1490,22 +1492,12 @@
             } catch (e) { }
         }
 
-        function toggleSpeech() {
-            speechEnabled = !speechEnabled;
-            const btn = document.getElementById('speechToggleBtn');
-
-            if (speechEnabled) {
-                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
-                btn.title = 'Mute';
-                updateServerStatus('online', 'Voice unmuted');
+        // Speak last response - called by speaker button
+        function speakLastResponse() {
+            if (lastResponse) {
+                speakText(lastResponse, currentLanguage);
             } else {
-                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
-                btn.title = 'Unmute';
-                if (synth) {
-                    synth.cancel();
-                    hideAudioPlayer();
-                }
-                updateServerStatus('online', 'Voice muted');
+                updateServerStatus('warning', 'No response to read yet');
             }
         }
 
@@ -1625,11 +1617,6 @@
 
         // Speak text with player controls
         function speakText(text, language = 'en') {
-            if (!speechEnabled) {
-                updateServerStatus('warning', 'Voice is muted. Click 🔊 to unmute');
-                return;
-            }
-
             if (!synth) return;
 
             // Stop any ongoing speech
@@ -1764,15 +1751,6 @@
 
             // Start speaking
             synth.speak(currentUtterance);
-        }
-
-        // Speak last response - called by speaker button
-        function speakLastResponse() {
-            if (lastResponse) {
-                speakText(lastResponse, currentLanguage);
-            } else {
-                updateServerStatus('warning', 'No response to read yet');
-            }
         }
 
         // Quick question
@@ -1953,6 +1931,25 @@
                 </div>
             `;
 
+            // Add speaker button for bot messages
+            if (sender === 'bot') {
+                const messageContent = messageRow.querySelector('.message-content');
+                if (messageContent) {
+                    const speakerBtn = document.createElement('button');
+                    speakerBtn.className = 'icon-btn';
+                    speakerBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: var(--surface-glass); border-radius: 50%; border: 1px solid var(--surface-border); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5;';
+                    speakerBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+                    speakerBtn.title = 'Play this response';
+                    speakerBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        speakText(text, currentLanguage);
+                    };
+                    
+                    messageContent.style.position = 'relative';
+                    messageContent.appendChild(speakerBtn);
+                }
+            }
+
             const meta = document.createElement('div');
             meta.className = 'message-meta';
             meta.innerHTML = `<span>${time}</span><span>•</span><span>${sender === 'user' ? 'Official Inquiry' : 'Judicial Response'}</span>`;
@@ -1960,8 +1957,6 @@
 
             messagesDiv.appendChild(messageRow);
             messagesDiv.scrollTo({ top: messagesDiv.scrollHeight, behavior: 'smooth' });
-
-            // Voice only plays when user clicks speaker button
         }
 
         // ===== SHOW COLLECTED DETAILS =====
